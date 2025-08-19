@@ -1,6 +1,6 @@
 # ECHO
 
-**frEquenCy-aware Hierarchical encOding for variable-length Signal**
+**frEquenCy-aware Hierarchical encOding for variable-length signal**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Hugging Face](https://img.shields.io/badge/HuggingFace-ECHO-orange)](https://huggingface.co/yucongzh/ECHO/tree/main)
