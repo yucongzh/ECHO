@@ -51,7 +51,36 @@ from models.ECHO import AudioMAEWithBand
 model = AudioMAEWithBand.from_pretrained("path_to_echo_small_checkpoint.pth")
 
 # Extract features from audio
-features = model.extract_features(spectrogram, sample_rate=16000)
+# Load audio
+waveform, sample_rate = torchaudio.load(audio_path)
+
+# Convert to mono if stereo
+if waveform.shape[0] > 1:
+    waveform = waveform.mean(dim=0, keepdim=True)
+
+# Remove DC component
+waveform = waveform - waveform.mean()
+
+# Convert to spectrogram
+window_size = int(0.025 * sample_rate)  # 25ms, use original sr
+hop_size = int(0.01 * sample_rate)      # 10ms
+
+stft = torchaudio.transforms.Spectrogram(
+    n_fft=window_size,
+    hop_length=hop_size,
+    power=1,
+    center=False
+)
+
+spec = stft(waveform.squeeze(0))
+spec = torch.log(spec + 1e-9)
+
+# Normalize (use your model's normalization values)
+norm_mean = -5.874158
+norm_std = 5.223174
+spec = (spec - norm_mean) / (norm_std * 2)
+
+features = model.extract_features(spec, sample_rate=sample_rate) # use original sr
 print(f"Feature dimension: {features.shape}")
 ```
 
@@ -126,9 +155,7 @@ model.eval()
 # Prepare audio input
 def extract_features(audio_path, sample_rate=16000):
     # Load audio
-    waveform, sr = torchaudio.load(audio_path)
-    if sr != sample_rate:
-        waveform = torchaudio.transforms.Resample(sr, sample_rate)(waveform)
+    waveform, sample_rate = torchaudio.load(audio_path)
     
     # Convert to mono if stereo
     if waveform.shape[0] > 1:
@@ -138,7 +165,7 @@ def extract_features(audio_path, sample_rate=16000):
     waveform = waveform - waveform.mean()
     
     # Convert to spectrogram
-    window_size = int(0.025 * sample_rate)  # 25ms
+    window_size = int(0.025 * sample_rate)  # 25ms, use original sr
     hop_size = int(0.01 * sample_rate)      # 10ms
     
     stft = torchaudio.transforms.Spectrogram(
@@ -158,7 +185,7 @@ def extract_features(audio_path, sample_rate=16000):
     
     # Extract features
     with torch.no_grad():
-        features = model.extract_features(spec, sample_rate)
+        features = model.extract_features(spec, sample_rate) # use original sr
     
     return features
 
@@ -172,14 +199,14 @@ if __name__ == "__main__":
 
 ## Citation
 coming soon
-<!-- ```bibtex
-@article{echo2024,
-  title={ECHO: Enhanced Contextual Hierarchical Output for Audio Representation Learning},
-  author={Your Name},
-  journal={arXiv preprint},
-  year={2024}
+```bibtex
+@article{echo2025,
+  title={ECHO: Frequency-aware Hierarchical Encoding for Variable-length Signal},
+  author={Yucong Zhang and Juan Liu and Ming Li},
+  journal={arXiv preprint arXiv:2508.14689},
+  year={2025},
 }
-``` -->
+```
 
 ## License
 
