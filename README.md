@@ -45,7 +45,7 @@ The ECHO model consists of:
 ### Model Import
 
 ```python
-# Download From Huggingface
+# Download from Huggingface (recommended)
 from huggingface_hub import snapshot_download
 
 # Download the model to local directory
@@ -86,7 +86,7 @@ model.load_state_dict(state_dict, strict=False)
 
 ---
 
-# Download Checkpoint (*.pth) from other sources (eg. Zenodo)
+# Clone this repository and download checkpoint (*.pth) from other sources (eg. Zenodo)
 model_path = "/path/to/checkpoint.pth"
 checkpoint = torch.load(model_path, map_location='cuda')
 
