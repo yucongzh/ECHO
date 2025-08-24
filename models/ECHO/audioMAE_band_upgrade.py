@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 from einops import rearrange
-from .modules import PatchEmbed
-from .utils import get_2d_sincos_pos_embed, get_sincos_encoding_1d, get_1d_sincos_pos_embed_from_grid
+from modules import PatchEmbed
+from utils import get_2d_sincos_pos_embed, get_sincos_encoding_1d, get_1d_sincos_pos_embed_from_grid
 import numpy as np
 import os
 
@@ -438,9 +438,12 @@ class AudioMAEWithBand(nn.Module):
         
         # Extract CLS tokens from each band and concatenate
         cls_tokens = tokens[:, 0, :]  # (num_bands, embed_dim)
-        features = cls_tokens.flatten()  # (num_bands * embed_dim,)
+        utt_feature = cls_tokens.flatten()  # (num_bands * embed_dim,)
+
+        frame_feature = tokens[:, 1:, :]  # (num_bands, num_patches, embed_dim)
+        frame_feature = rearrange(frame_feature, 'b t d -> t (b d)')  # (num_patches, num_bands * embed_dim)
         
-        return features
+        return utt_feature, frame_feature
 
     def forward(self, x, sample_rate, mask_ratio=None, freq_pos_emb=None, band_spectrograms=None, band_patch_indices=None):
         """
@@ -488,5 +491,94 @@ class AudioMAEWithBand(nn.Module):
         tokens = self.norm(tokens) # normalize to suit downstream tasks
         
         return tokens, mask, ids_restore, band_patch_indices, patches, ids_keep, freq_pos_emb, band_spectrograms
+
+
+    def preprocess_audio_to_spectrogram(self, audio_signal, sample_rate, max_length=2000):
+        """
+        Convert audio to spectrogram for ECHO model input.
+        
+        Args:
+            audio_signal: Audio tensor of shape [channels, samples]
+            sample_rate: Audio sample rate
+            max_length: Maximum time length for spectrogram
+            
+        Returns:
+            spec: Preprocessed spectrogram tensor
+        """
+        import torch
+        import torchaudio
+        
+        # Remove DC component
+        waveform = audio_signal - audio_signal.mean()
+        
+        # Convert to spectrogram
+        window_size = int(0.025 * sample_rate)  # 25ms window
+        hop_size = int(0.01 * sample_rate)      # 10ms hop
+        
+        stft = torchaudio.transforms.Spectrogram(
+            n_fft=window_size,
+            hop_length=hop_size,
+            power=1, 
+            center=False
+        )
+        
+        spec = stft(waveform.squeeze(0))
+        spec = torch.log(spec + 1e-9)
+        
+        # Normalize (using ECHO-specific values)
+        norm_mean = -5.874158
+        norm_std = 5.223174
+        spec = (spec - norm_mean) / (norm_std * 2)
+        
+        return spec
+
+    def extract_features_from_audio(self, audio_signal, sample_rate=16000):
+        """
+        Extract features directly from audio signal using ECHO model.
+        
+        Args:
+            audio_signal: Audio tensor of shape [channels, samples]
+            sample_rate: Audio sample rate
+            
+        Returns:
+            features: Extracted features tensor
+        """
+        import torch
+        
+        # Preprocess audio
+        spec = self.preprocess_audio_to_spectrogram(audio_signal, sample_rate)
+        
+        # Process in segments if needed
+        max_length = 2000
+        input_specs = []
+        num_segments = spec.shape[-1] // max_length
+        
+        for i in range(num_segments):
+            segment = spec[..., i * max_length:(i + 1) * max_length]
+            input_specs.append(segment)
+        
+        # Handle remaining part
+        if num_segments * max_length < spec.shape[-1]:
+            remaining = spec[..., -max_length:]
+            input_specs.append(remaining)
+        
+        # Extract features
+        utt_features = []
+        frame_features = []
+        with torch.no_grad():
+            for segment_spec in input_specs:
+                if hasattr(self, 'extract_features'):
+                    feature = self.extract_features(segment_spec, sample_rate)
+                else:
+                    # Use forward method if extract_features not available
+                    segment_input = segment_spec.unsqueeze(0).unsqueeze(0)
+                    feature = self.forward(segment_input, sample_rate)
+                utt_features.append(feature[0].cpu())
+                frame_features.append(feature[1].cpu())
+        
+        # Aggregate features (mean pooling)
+        utt_features = torch.stack(utt_features, dim=0).mean(dim=0)
+        frame_features = torch.vstack(frame_features)
+        return utt_features, frame_features
 
 
