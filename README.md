@@ -3,7 +3,7 @@
 **frEquenCy-aware Hierarchical encOding for variable-length signal**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Hugging Face](https://img.shields.io/badge/🤗%20HuggingFace-Model-orange)](https://huggingface.co/yucongzh/ECHO/tree/main)
+[![Hugging Face](https://img.shields.io/badge/🤗%20HuggingFace-Model-orange)](https://huggingface.co/yucongzh/echo-small-0824)
 [![Hugging Face Paper](https://img.shields.io/badge/🤗%20HuggingFace-Paper-FFD21E)](https://huggingface.co/papers/2508.14689)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.14689-b31b1b.svg)](https://arxiv.org/abs/2508.14689)
 [![DOI](https://zenodo.org/badge/DOI/10.48550/arXiv.2508.14689.svg)](https://zenodo.org/records/16935787)
