@@ -56,9 +56,9 @@ def main():
     
     # Extract features
     print("\nExtracting features...")
-    with torch.no_grad():
+    with torch.inference_mode():
         try:
-            features = model.extract_features(dummy_spec, sample_rate=16000)
+            features,_ = model.extract_features(dummy_spec, sample_rate=16000)
             print(f"Feature extraction successful!")
             print(f"Output feature shape: {features.shape}")
             print(f"Feature statistics:")
