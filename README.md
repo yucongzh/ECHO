@@ -8,8 +8,14 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2508.14689-b31b1b.svg)](https://arxiv.org/abs/2508.14689)
 [![DOI](https://zenodo.org/badge/DOI/10.48550/arXiv.2508.14689.svg)](https://zenodo.org/records/16935787)
 
+ECHO is a state-of-the-art general signal representation learning model based on Masked Autoencoders (MAE) with band-splitting and frequency position encoding.
 
-ECHO is a state-of-the-art audio representation learning model based on Masked Autoencoders (MAE) with band-splitting and frequency position encoding.
+## Performance
+
+Overall performance summary on [SIREN](https://github.com/yucongzh/SIREN) benchmark (DCASE anomaly detection + Fault classification):
+
+![Performance Summary](performance.png)
+
 
 ## Features
 
