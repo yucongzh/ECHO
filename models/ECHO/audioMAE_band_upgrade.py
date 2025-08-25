@@ -520,7 +520,7 @@ class AudioMAEWithBand(nn.Module):
             hop_length=hop_size,
             power=1, 
             center=False
-        )
+        ).to(waveform.device)
         
         spec = stft(waveform.squeeze(0))
         spec = torch.log(spec + 1e-9)
