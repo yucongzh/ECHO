@@ -6,5 +6,5 @@ This package provides the ECHO model architecture for audio feature extraction.
 
 from .audioMAE_band_upgrade import AudioMAEWithBand
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = ["AudioMAEWithBand"]

@@ -581,4 +581,3 @@ class AudioMAEWithBand(nn.Module):
         frame_features = torch.vstack(frame_features)
         return utt_features, frame_features
 
-

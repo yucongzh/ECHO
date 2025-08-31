@@ -1,54 +1,62 @@
 # ECHO
 
-**frEquenCy-aware Hierarchical encOding for variable-length signal**
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Hugging Face](https://img.shields.io/badge/🤗%20HuggingFace-Model-orange)](https://huggingface.co/yucongzh/echo-small-0824)
-[![Hugging Face Paper](https://img.shields.io/badge/🤗%20HuggingFace-Paper-FFD21E)](https://huggingface.co/papers/2508.14689)
+[![Hugging Face](https://img.shields.io/badge/🤗%20ECHO-Small-orange)](https://huggingface.co/yucongzh/echo-small-0824)
+[![Hugging Face](https://img.shields.io/badge/🤗%20ECHO-Tiny-orange)](https://huggingface.co/yucongzh/echo-tiny-0828)
 [![arXiv](https://img.shields.io/badge/arXiv-2508.14689-b31b1b.svg)](https://arxiv.org/abs/2508.14689)
-[![DOI](https://zenodo.org/badge/DOI/10.48550/arXiv.2508.14689.svg)](https://zenodo.org/records/16935787)
+<!-- [![DOI](https://zenodo.org/badge/DOI/10.48550/arXiv.2508.14689.svg)](https://zenodo.org/records/16935787) -->
 
-ECHO is a state-of-the-art general signal representation learning model based on Masked Autoencoders (MAE) with band-splitting and frequency position encoding.
+ECHO (fr**E**quen**C**y-aware **H**ierarchical enc**O**ding for variable-length signal) is a general machine signal representation learning model based on Masked Autoencoders (MAE) with band-splitting and frequency positional encoding that handles variable lengths.
 
-## Performance
+## 🔄 Important Updates
+- [2025.08.28] We release the `Tiny` version of ECHO.
+- [2025.08.28] Update results on the updated SIREN benchmark.
+
+## 📊 Performance
 
 Overall performance summary on [SIREN](https://github.com/yucongzh/SIREN) benchmark (DCASE anomaly detection + Fault classification):
 
 ![Performance Summary](performance.png)
 
 
-## Features
+## ✨ Key Features
 
 - **Band-splitting architecture**: Processes audio in frequency bands for better local and global representation learning
 - **Frequency position encoding**: Incorporates frequency information into the model for better audio understanding
 - **Efficient patch embedding**: Uses sliding window patches for temporal modeling, enabling varying time lengths
 
-## Installation
+## 🚀 Installation
 
 ```bash
+# via pip
 pip install -r requirements.txt
+
+# via conda
+## create new environment
+conda env create -f environment.yml
+conda activate echo-env
+## or update environment
+conda env update -f environment.yml
 ```
 
-## Pre-trained Models
+## 🔥 Models Checkpoints
 
 | Model | Embed Dim | Layers | Heads | Parameters | Download |
 |-------|-----------|--------|-------|------------|----------|
 | ECHO-Small | 384 | 12 | 6 | ~21.5M | [Hugging Face](https://huggingface.co/yucongzh/echo-small-0824) · [Zenodo](https://zenodo.org/records/16935787) |
-| ECHO-Base | - | - | - | - | Coming Soon |
-| ECHO-Mini | - | - | - | - | Coming Soon |
-| ECHO-Tiny | - | - | - | - | Coming Soon |
+| ECHO-Tiny  | 192 | 12 | 3 | ~5.5M  | [Hugging Face](https://huggingface.co/yucongzh/echo-tiny-0828) · [Zenodo](https://zenodo.org/records/16935787) |
 
-## Model Architecture
+<!-- ## 🏗️ Model Architecture
 
 The ECHO model consists of:
-- **Patch Embedding**: Converts spectrogram bands to patch embeddings
-- **Transformer Encoder**: Multi-layer transformer for feature learning
-- **Frequency Position Encoding**: Adds frequency-aware positional information
+- **Transformer Encoder**: Backbone based on Vision Transformers
 - **Band Processing**: Splits audio into frequency bands for hierarchical learning
+- **Sliding patches**: Models spectrogram bands with sliding patches
+- **Frequency Positional Encoding**: Adds frequency-aware positional information to sub-bands -->
 
-## Usage
+## 💻 Usage
 
-### Model Import
+### Model Import (Use ECHO-small as an example)
 
 ```python
 # Download from Huggingface (recommended)
@@ -123,8 +131,8 @@ model.load_state_dict(checkpoint['encoder'])
 model.eval()
 
 # Example usage
-audio_signal = torch.randn(1, 80000)  # 5 seconds at 16kHz
-sample_rate = 16000
+audio_signal = torch.randn(1, 240000)  # 5 seconds at 48kHz
+sample_rate = 48000
 
 # Method 1: Extract features directly from audio (Recommended)
 with torch.inference_mode():
@@ -133,7 +141,7 @@ print(f"Utterance-level Feature shape: {utterance_level_features.shape}")  # Sho
 print(f"Segment-level Feature shape: {segment_level_features.shape}")  # Should be [32,2688]
 
 # Method 2: Use preprocessing separately, then extract features
-spec = model.preprocess_audio_to_spectrogram(audio_signal, sample_rate=16000)
+spec = model.preprocess_audio_to_spectrogram(audio_signal, sample_rate=sample_rate)
 print(f"Spectrogram shape: {spec.shape}")
 
 # Extract features from preprocessed spectrogram
@@ -144,7 +152,7 @@ print(f"Segment-level Feature shape: {segment_level_features.shape}")  # Should 
 ```
 
 
-## Citation
+## 📚 Citation
 ```bibtex
 @article{echo2025,
   title={ECHO: Frequency-aware Hierarchical Encoding for Variable-length Signal},
