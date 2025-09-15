@@ -10,7 +10,6 @@ ECHO (fr**E**quen**C**y-aware **H**ierarchical enc**O**ding for variable-length 
 
 ## 🔄 Important Updates
 - [2025.08.28] We release the `Tiny` version of ECHO.
-- [2025.08.28] Update results on the updated SIREN benchmark.
 
 ## 📊 Performance
 
