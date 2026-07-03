@@ -153,11 +153,13 @@ print(f"Segment-level Feature shape: {segment_level_features.shape}")  # Should 
 
 ## 📚 Citation
 ```bibtex
-@article{echo2025,
-  title={ECHO: Frequency-aware Hierarchical Encoding for Variable-length Signal},
-  author={Yucong Zhang and Juan Liu and Ming Li},
-  journal={arXiv preprint arXiv:2508.14689},
-  year={2025},
+@inproceedings{zhang2026echo,
+  title={ECHO: Frequency-Aware Hierarchical Encoding for Variable-Length Signals},
+  author={Zhang, Yucong and Liu, Juan and Li, Ming},
+  booktitle={ICASSP 2026-2026 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={4301--4305},
+  year={2026},
+  organization={IEEE}
 }
 ```
 
